@@ -1,0 +1,87 @@
+---
+title: "eds223_hw4"
+format: html
+editor: visual
+---
+
+# Full Workflow
+
+## Load and Prepare Data
+```{r}
+library(tidyverse)
+library(tmap)
+library(sf)
+library(stars)
+library(terra)
+
+
+# west coast exclusive economic zones
+eez <- st_read(here::here('data', 'wc_regions_clean.shp'))
+
+# general bathymetric chart of the oceans
+bathy <- rast(here::here('data', 'depth.tif'))
+
+# sea surface temperature rasters from 2008 - 2012
+sst <- c(rast(here::here('data', 'average_annual_sst_2008.tif')),
+                    rast(here::here('data', 'average_annual_sst_2009.tif')),
+                    rast(here::here('data', 'average_annual_sst_2010.tif')),
+                    rast(here::here('data', 'average_annual_sst_2011.tif')),
+                    rast(here::here('data', 'average_annual_sst_2012.tif')))
+
+# transforming all crs to california albers
+eez <- st_transform(eez, crs = 'epsg:3310')
+crs(bathy) <- 'epsg:3310'
+crs(sst) <- 'epsg:3310'
+
+```
+
+## Process Data
+```{r}
+# get mean of all sst rasters by cell
+mean_sst <- mean(sst)
+
+# convert average sst from kelvin to celsius
+mean_sst_c <- mean_sst - 273.15
+
+# crop depth raster to equal that of sst raster
+# these don't match exactly, will this be a problem?
+bathy_crop <- crop(bathy, mean_sst_c)
+
+# resample bathymetry to match resolution of sst
+bathy_resample <- resample(bathy_crop, mean_sst_c, method = 'near')
+
+# test extents of bathymetry and sst match
+if (ext(bathy_resample) == ext(mean_sst_c) & 
+    res(bathy_resample)[1] == res(mean_sst_c)[1] & 
+    res(bathy_resample)[2] == res(mean_sst_c)[2] & 
+    crs(bathy_resample) == crs(mean_sst_c)) {
+  cat('Extent, resolution, and CRS of Bathymetry and SST match exactly.\n')
+} else {
+  stop('One of (extent, resolution, CRS) does not match between bathymetry and SST.\n')
+}
+
+# try stacking sst with depth raster before resample, expect fail
+tryCatch(
+  expr = {
+    bathy_sst_test_stack <- c(bathy_crop, mean_sst_c) 
+    cat("No error, raster's stacked.\n")
+    }, 
+  error = function(e) {
+    message('Attempting to stack sst and depth before resampling failed, as expected.')
+  }
+)
+
+# try stacking sst with depth raster after resample, expect success
+tryCatch(
+  expr = {
+    bathy_sst_test_stack <- c(bathy_resample, mean_sst_c) 
+    cat("Resampled bathymetry and SST rasters stack properly, as expected.\n")
+    }, 
+  error = function(e) {
+    message('Unexpected Error. One of (extent, resolution, CRS) does not match between bathymetry and SST.\n')
+  }
+)
+
+
+```
+
