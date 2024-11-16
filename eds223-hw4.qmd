@@ -7,6 +7,7 @@ editor: visual
 # Full Workflow
 
 ## Load and Prepare Data
+
 ```{r}
 library(tidyverse)
 library(tmap)
@@ -36,6 +37,7 @@ crs(sst) <- 'epsg:3310'
 ```
 
 ## Process Data
+
 ```{r}
 # get mean of all sst rasters by cell
 mean_sst <- mean(sst)
@@ -82,6 +84,42 @@ tryCatch(
   }
 )
 
+
+```
+
+Species in Question: Pacific Geoduck (*Panopea generosa*)
+
+-   Depth range: 0 - 110 m
+-   Temperature range: 8.3 - 12.8
+
+## Find suitable locations for *Panopea generosa*
+
+```{r}
+# make bathymetry reclass matrix
+bathy_reclass <- matrix(c(minmax(bathy_resample)[1] - 1, -110, 0,
+                          -110, 0, 1,
+                          0, minmax(bathy_resample)[2], 0), 
+                        ncol = 3,
+                        byrow = TRUE)
+
+# make sst reclass matrix
+sst_reclass <- matrix(c(0, 8.3, 0, 
+                        8.3, 12.8, 1,
+                        12.8, minmax(mean_sst_c)[2], 0), 
+                        ncol = 3,
+                        byrow = TRUE)
+
+# reclassify bathymetry for suitable geoduck habitat
+bathy_geo_hab <- classify(bathy_resample, bathy_reclass)
+
+# reclassify sst for suitable geoduck habitat
+sst_geo_hab <- classify(mean_sst_c, sst_reclass)
+
+# create stack for subsetting two rasters at once
+geo_hab_stack <- c(bathy_geo_hab, sst_geo_hab)
+
+# subset cells in which both sst and depth are suitable
+geoduck_suitability <- app(geo_hab_stack, min)
 
 ```
 
