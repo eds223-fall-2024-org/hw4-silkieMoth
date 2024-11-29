@@ -1,5 +1,7 @@
 ---
 title: "eds223_hw4"
+author: 'Joshua Paul Cohen'
+date: last-modified
 format: html
 editor: visual
 ---
@@ -31,7 +33,6 @@ library(sf)
 library(stars)
 library(terra)
 library(testthat)
-library(OpenStreetMap)
 
 # west coast exclusive economic zones
 eez <- st_read(here::here('data', 'wc_regions_clean.shp'), quiet = TRUE)
@@ -271,13 +272,13 @@ tm_shape(eez_totals) +
   tm_layout(title = paste('Most Suitable Exclusive Economic Zones for', species), 
             asp = 1, 
             inner.margins = c(0.02,0.02,0.1,0.02), 
-            legend.position = c('right', 0.65), 
+            legend.position = c(0.75, 0.6), 
             legend.frame = 'grey60',
             title.position = c(0.05, 'top')) + 
   tm_compass(size = 3, 
              type = '4star',
-             position = c('left', 'bottom')) + 
-  tm_scale_bar(position = c('left', 'bottom'))
+             position = c('left', 0.14)) + 
+  tm_scale_bar(position = c('left', 0.08))
 
 }
 ```
@@ -423,13 +424,13 @@ tm_shape(eez_totals) +
   tm_layout(title = paste('Most Suitable Exclusive Economic Zones for', 'Oysters'), 
             asp = 1, 
             inner.margins = c(0.02,0.02,0.1,0.02), 
-            legend.position = c('right', 0.65), 
+            legend.position = c(0.75, 0.6), 
             legend.frame = 'grey60',
             title.position = c(0.05, 'top')) + 
   tm_compass(size = 3, 
              type = '4star',
-             position = c('left', 'bottom')) + 
-  tm_scale_bar(position = c('left', 'bottom'))
+             position = c('left', 0.14)) + 
+  tm_scale_bar(position = c('left', 0.08))
 ```
 
 
@@ -621,13 +622,13 @@ tm_shape(eez_totals) +
   tm_layout(title = paste('Most Suitable Exclusive Economic Zones for', species), 
             asp = 1, 
             inner.margins = c(0.02,0.02,0.1,0.02), 
-            legend.position = c('right', 0.65), 
+            legend.position = c(0.75, 0.6), 
             legend.frame = 'grey60',
             title.position = c(0.05, 'top')) + 
   tm_compass(size = 3, 
              type = '4star',
-             position = c('left', 'bottom')) + 
-  tm_scale_bar(position = c('left', 'bottom'))
+             position = c('left', 0.14)) + 
+  tm_scale_bar(position = c('left', 0.08))
 
 }
 ```
@@ -641,6 +642,7 @@ tm_shape(eez_totals) +
 ```{r, results='hide'}
 eez_map(species = 'Oysters', min_depth = -70, max_depth = 0, min_temp = 11, max_temp = 30)
 ```
+*Figure 1: Oysters have the most Pacific habitat along the south of the United States, when accounting for water depth and temperature alone. However, the north also has habitat present, with only Northern California being habitat poor.*
 
 ##### Pacific Geoduck (*Panopea generosa*) Parameters:
 -   Depth range (MBSL): 0 - 110
@@ -649,5 +651,15 @@ eez_map(species = 'Oysters', min_depth = -70, max_depth = 0, min_temp = 11, max_
 ```{r, results='hide'}
 eez_map(species = 'Pacific Geoduck', min_depth = -110, max_depth = 0, min_temp = 8.3, max_temp = 12.8)
 ```
+*Figure 2: Pacific Geoduck has the most suitable habitat in the northern sections of the Pacific coast, when accounting for water depth and temperature alone. However, Northern and Central California are also abundant in habitat, with only Southern CA poor habitat overall.*
 
-## Citations
+## Data Citations
+
+| Data | Citation | Link |
+|-------------------|----------------------------------|-------------------|
+| OpenStreetMap from Geofabrik | Fellows I, Stotz utJlbJP (2023). _OpenStreetMap: Access to Open Street Map Raster Images_. R package version 0.4.0, https://CRAN.R-project.org/package=OpenStreetMap | [Link](https://www.openstreetmap.org) |
+|Pacific Geoduck page on SeaLifeBase | Pacific Northwest Shell Club 2014 Pacific Northwest marine molluscan biodiversity. Pacific Northwest Shell Club, www.PNWCS.org. http://www.bily.com/pnwsc/web-content/Northwest%20Marine%20Molluscan%20Biodiversity.html [Accessed 06/02/2014]. | [Link](https://www.sealifebase.ca/summary/Panopea-generosa.html) |
+| NOAA’s 5km Daily Global Satellite Sea Surface Temperature Anomaly v3.1. | NOAA Coral Reef Watch. 2018. Daily Global 5km Satellite Sea Surface Temperature Anomaly. Version 3.1, released August 1, 2018. | [Link](https://coralreefwatch.noaa.gov/product/5km/index_5km_ssta.php) |
+| GEBCO California Bathymetry Data | GEBCO Compilation Group (2024) GEBCO 2024 Grid (doi:10.5285/1c44ce99-0a0d-5f4f-e063-7086abc0ea0f) | [Link](https://www.gebco.net/data_and_products/gridded_bathymetry_data/#area) |
+| Exclusive Economic Zone Boundaries | Flanders Marine Institute (2024). Union of the ESRI Country shapefile and the Exclusive Economic Zones (version 4). Available online at https://www.marineregions.org/. https://doi.org/10.14284/698. Consulted in 2024. | [Link](https://www.marineregions.org/eez.php) |
+
